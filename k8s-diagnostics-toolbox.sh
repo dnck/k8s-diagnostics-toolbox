@@ -289,6 +289,10 @@ function diag_crictl() {
   if [ -z "$CONTAINER_RUNTIME_ENDPOINT" ] && [ -S /var/run/dockershim.sock ]; then
     export CONTAINER_RUNTIME_ENDPOINT=unix:///var/run/dockershim.sock
   fi
+  if [ -z "$CONTAINER_RUNTIME_ENDPOINT" ] && [ -S /var/run/containerd/containerd.sock ]; then
+      export CONTAINER_RUNTIME_ENDPOINT=unix:///var/run/containerd/containerd.sock
+  fi
+
   "$(_diag_tool_path crictl)" "$@"
   )
 }
@@ -486,7 +490,7 @@ function _diag_list_functions() {
 }
 
 function _diag_is_k8s_node() {
-  [ -n "${CONTAINER_RUNTIME_ENDPOINT}" ] || [ -n "${KUBERNETES_SERVICE_HOST}" ] || [ -S /var/snap/microk8s/common/run/containerd.sock ] || [ -S /var/run/dockershim.sock ]
+  [ -n "${CONTAINER_RUNTIME_ENDPOINT}" ] || [ -n "${KUBERNETES_SERVICE_HOST}" ] || [ -S /var/run/containerd/containerd.sock ] || [ -S /var/snap/microk8s/common/run/containerd.sock ] || [ -S /var/run/dockershim.sock ]
 }
 
 function diag_collect_multiple_dumps() {

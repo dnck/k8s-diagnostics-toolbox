@@ -9,6 +9,15 @@
 #
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
+function _realpath() {
+    rp=`which realpath`
+    if [ -n "$rp" ]; then
+        $rp $1
+        return
+    fi
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+
 function diag_nsenter() {
   if [[ "$1" == "--desc" || "$1" == "--help" ]]; then
     echo "Uses nsenter to run a program in the pod's OS namespace"
@@ -218,7 +227,7 @@ function diag_jfr_to_flamegraph() {
   java -cp "$(_diag_tool_cache_dir async-profiler)/build/converter.jar" jfr2flame "$JFR_FILE" "$FLAMEGRAPH_FILE"
   if [ $? -eq 0 ]; then
     _diag_chown_sudo_user "$FLAMEGRAPH_FILE"
-    echo "Result in file://$(realpath "$FLAMEGRAPH_FILE")"
+    echo "Result in file://$(_realpath "$FLAMEGRAPH_FILE")"
   fi
 }
 
